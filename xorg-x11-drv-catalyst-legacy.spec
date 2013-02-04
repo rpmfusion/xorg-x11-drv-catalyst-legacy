@@ -5,7 +5,7 @@
 %global    __strip /bin/true
 Name:            xorg-x11-drv-catalyst-legacy
 Version:         13.1
-Release:         1%{?dist}
+Release:         2%{?dist}
 Summary:         AMD's proprietary driver for ATI legacy graphic cards
 Group:           User Interface/X Hardware Support
 License:         Redistributable, no modification permitted
@@ -20,6 +20,7 @@ Source6:         catalyst-legacy-a-ac-aticonfig
 Source7:         catalyst-legacy-a-lid-aticonfig
 Source8:         00-catalyst-legacy-modulepath.conf
 Source9:         01-catalyst-legacy-videodriver.conf
+Source10:        blacklist-radeon.conf
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -300,6 +301,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_sbindir}/amdnotifyui
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d
 echo "%{atilibdir}" > $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/catalyst-legacy-%{_lib}.conf
 
+#Blacklist radeon
+install -m 0755 -d $RPM_BUILD_ROOT%{_prefix}/lib/modprobe.d/
+install -p -m 0644 %{SOURCE10} $RPM_BUILD_ROOT%{_prefix}/lib/modprobe.d/
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -351,6 +356,7 @@ fi ||:
 %doc %{_docdir}/amdcccle/ccc_copyrights.txt
 %config(noreplace) %{_sysconfdir}/security/console.apps/amdcccle-su
 %config %{_sysconfdir}/X11/xorg.conf.d/*catalyst*.conf
+%{_prefix}/lib/modprobe.d/blacklist-radeon.conf
 %{_sysconfdir}/ati/atiogl.xml
 %{_sysconfdir}/ati/logo.xbm.example
 %{_sysconfdir}/ati/logo_mask.xbm.example
@@ -401,6 +407,9 @@ fi ||:
 
 
 %changelog
+* Mon Feb 04 2013 Leigh Scott <leigh123linux@googlemail.com> - 13.1-2
+- add blacklist file to %%{_prefix}/lib/modprobe.d/
+
 * Mon Feb 04 2013 Leigh Scott <leigh123linux@googlemail.com> - 13.1-1
 - Update to Catalyst legacy (internal version 13.1 8.97.100.7)
 
